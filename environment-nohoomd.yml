@@ -4,6 +4,7 @@ channels:
 dependencies:
 - freud=2.4.1
 - gsd=2.4.1
+- matplotlib=3.5
 - mbuild=0.10.13
 - numpy=1.20.1
 - pip=21.0.1
