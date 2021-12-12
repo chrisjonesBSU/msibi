@@ -64,6 +64,9 @@ class MSIBI(object):
         The radius values at which the potential is computed.
     r_switch : float
         The radius after which a tail correction is applied.
+    head_correction : str
+        The functional form to use in the potential head correction.
+        Options are "linear" and "exponential"
     """
 
     def __init__(
@@ -75,6 +78,7 @@ class MSIBI(object):
         r_switch=None,
         rdf_exclude_bonded=False,
         smooth_rdfs=False,
+        head_correction="exponential",
         verbose=False
     ):
 
@@ -94,6 +98,7 @@ class MSIBI(object):
         self.smooth_rdfs = smooth_rdfs
         self.rdf_r_range = np.array([rmin, self.rdf_cutoff + self.dr])
         self.rdf_n_bins = self.n_rdf_points
+        self.head_correction = head_correction
 
         # Sometimes the pot_cutoff and rdf_cutoff have different ranges,
         # e.g. to look at long-range correlations
