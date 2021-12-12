@@ -64,9 +64,6 @@ class MSIBI(object):
         The radius values at which the potential is computed.
     r_switch : float
         The radius after which a tail correction is applied.
-    head_correction : str
-        The functional form to use in the potential head correction.
-        Options are "linear" and "exponential"
     """
 
     def __init__(
@@ -78,7 +75,6 @@ class MSIBI(object):
         r_switch=None,
         rdf_exclude_bonded=False,
         smooth_rdfs=False,
-        head_correction="exponential",
         verbose=False
     ):
 
