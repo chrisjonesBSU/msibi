@@ -35,7 +35,7 @@ class Pair(object):
         Values of the potential at every pot_r.
     """
 
-    def __init__(self, type1, type2, potential, head_correction_form="linear"):
+    def __init__(self, type1, type2, potential, head_correction_form):
         self.type1 = str(type1)
         self.type2 = str(type2)
         self.name = f"{self.type1}-{self.type2}"

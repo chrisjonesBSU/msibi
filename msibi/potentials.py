@@ -46,7 +46,7 @@ def tail_correction(r, V, r_switch):
     return V * S_r
 
 
-def head_correction(r, V, previous_V, form="linear"):
+def head_correction(r, V, previous_V, form):
     """Apply head correction to V making it go to a finite value at V(0).
 
     Parameters
