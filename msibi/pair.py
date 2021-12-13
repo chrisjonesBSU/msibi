@@ -49,7 +49,7 @@ class Pair(object):
         self.previous_potential = None
         self.head_correction_form = head_correction_form
 
-    def _add_state(self, state, smooth=True):
+    def _add_state(self, state):
         """Add a state to be used in optimizing this pair.
 
         Parameters
