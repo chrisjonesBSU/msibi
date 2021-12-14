@@ -64,6 +64,7 @@ class Pair(object):
             )
             negative_idx = np.where(target_rdf < 0)
             target_rdf[negative_idx] = 0
+            #SMOOTH AGAIN HERE - WHAT DOES THIS LOOK LIKE?
 
         self._states[state] = {
             "target_rdf": target_rdf,
@@ -93,17 +94,18 @@ class Pair(object):
         return np.stack((rdf.bin_centers, rdf.rdf*norm)).T
 
     def compute_current_rdf(self, state, smooth, verbose=False, query=True):
-
         rdf = self.get_state_rdf(state, query=query)
         self._states[state]["current_rdf"] = rdf
-
+        current_rdf = self._states[state]["current_rdf"]
         if state._opt.smooth_rdfs:
-            current_rdf = self._states[state]["current_rdf"]
             current_rdf[:, 1] = savitzky_golay(
                 current_rdf[:, 1], 9, 2, deriv=0, rate=1
             )
             negative_idx = np.where(current_rdf < 0)
             current_rdf[negative_idx] = 0
+
+            #SMOOTH AGAIN HERE? WHAT DOES THIS LOOK LIKE?
+            #POSSIBLE DISCONTINUITY INTRODUCED?
             if verbose:  # pragma: no cover
                 plt.title(f"RDF smoothing for {state.name}")
                 plt.plot(rdf[:,0], rdf[:, 1], label="unsmoothed")
@@ -113,7 +115,7 @@ class Pair(object):
 
         # Compute fitness function comparing the two RDFs.
         f_fit = calc_similarity(
-            rdf[:, 1], self._states[state]["target_rdf"][:, 1]
+            current_rdf[:, 1], self._states[state]["target_rdf"][:, 1]
         )
         self._states[state]["f_fit"].append(f_fit)
 
@@ -181,6 +183,7 @@ class Pair(object):
 
         # Apply corrections to ensure continuous, well-behaved potentials.
         pot = self.potential
+        self.potential = savitzky_golay(self.potential, 15, 1, 0, 1)
         self.potential = tail_correction(pot_r, self.potential, r_switch)
         tail = self.potential
         self.potential = head_correction(
@@ -189,6 +192,7 @@ class Pair(object):
             self.previous_potential,
             self.head_correction_form
         )
+        self.potential = savitzky_golay(self.potential, 15, 1, 0, 1)
         head = self.potential
         if verbose:  # pragma: no cover
             plt.plot(pot_r, head, label="head correction")
