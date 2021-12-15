@@ -187,15 +187,19 @@ class Pair(object):
 
         # Apply corrections to ensure continuous, well-behaved potentials.
         pot = self.potential
+        print("INITIAL SMOOTHING OF POTENTIAL")
         first_smooth_pot = savitzky_golay(self.potential, 15, 1, 0, 1)
+        print("PERFORMING TAIL CORRECTION")
         self.potential = tail_correction(pot_r, first_smooth_pot, r_switch)
         tail = self.potential
+        print("PERFORMING HEAD CORRECTION")
         self.potential = head_correction(
             pot_r,
             self.potential,
             self.previous_potential,
             self.head_correction_form
         )
+        print("SECOND SMOOTHING OF POTENTIAL")
         second_smooth_pot = savitzky_golay(self.potential, 15, 1, 0, 1)
         self.potential = second_smooth_pot
         head = self.potential
