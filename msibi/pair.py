@@ -189,7 +189,6 @@ class Pair(object):
         print("PERFORMING TAIL CORRECTION")
         self.potential = tail_correction(pot_r, first_smooth_pot, r_switch)
         tail = self.potential
-        print(self.potential)
         print("PERFORMING HEAD CORRECTION")
         self.potential = head_correction(
             pot_r,
