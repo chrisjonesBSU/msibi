@@ -94,9 +94,9 @@ class Pair(object):
         return np.stack((rdf.bin_centers, rdf.rdf*norm)).T
 
     def compute_current_rdf(self, state, smooth, verbose=False, query=True):
-        rdf = self.get_state_rdf(state, query=query)
-        self._states[state]["current_rdf"] = rdf
-        current_rdf = self._states[state]["current_rdf"]
+        current_rdf = self.get_state_rdf(state, query=query)
+        self._states[state]["current_rdf"] = current_rdf
+        #current_rdf = self._states[state]["current_rdf"]
         if state._opt.smooth_rdfs:
             current_rdf[:, 1] = savitzky_golay(
                 current_rdf[:, 1], 9, 2, deriv=0, rate=1
@@ -133,6 +133,7 @@ class Pair(object):
             The RDF bin size
         """
         rdf = self._states[state]["current_rdf"]
+        #WHAT IS THIS LINE DOING?
         rdf[:, 0] -= dr / 2
         np.savetxt(os.path.join(
             state.dir,
@@ -166,6 +167,9 @@ class Pair(object):
                 plt.show()
 
             # The actual IBI step.
+            print("RDFs before MSIBI STEP:")
+            print(current_rdf)
+            print(target_rdf)
             self.potential += (
                     kT * alpha * np.log(current_rdf[:,1] / target_rdf[:,1]) / len(self._states)
             )
