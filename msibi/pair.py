@@ -167,9 +167,6 @@ class Pair(object):
                 plt.show()
 
             # The actual IBI step.
-            print("RDFs before MSIBI STEP:")
-            print(current_rdf)
-            print(target_rdf)
             self.potential += (
                     kT * alpha * np.log(current_rdf[:,1] / target_rdf[:,1]) / len(self._states)
             )
@@ -192,6 +189,7 @@ class Pair(object):
         print("PERFORMING TAIL CORRECTION")
         self.potential = tail_correction(pot_r, first_smooth_pot, r_switch)
         tail = self.potential
+        print(self.potential)
         print("PERFORMING HEAD CORRECTION")
         self.potential = head_correction(
             pot_r,
@@ -199,6 +197,7 @@ class Pair(object):
             self.previous_potential,
             self.head_correction_form
         )
+        print(self.potential)
         print("SECOND SMOOTHING OF POTENTIAL")
         second_smooth_pot = savitzky_golay(self.potential, 15, 1, 0, 1)
         self.potential = second_smooth_pot
