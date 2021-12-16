@@ -181,7 +181,8 @@ class Pair(object):
 
         # Apply corrections to ensure continuous, well-behaved potentials.
         pot = self.potential
-        self.potential = tail_correction(pot_r, self.potential, r_switch)
+        first_smooth_pot = savitzky_golay(self.potential, 15, 1, 0, 1)
+        self.potential = tail_correction(pot_r, first_smooth_pot, r_switch)
         tail = self.potential
         self.potential = head_correction(
             pot_r,
@@ -189,6 +190,8 @@ class Pair(object):
             self.previous_potential,
             self.head_correction_form
         )
+        second_smooth_pot = savitzky_golay(self.potential, 15, 1, 0, 1)
+        self.potential = second_smooth_pot
         head = self.potential
         if verbose:  # pragma: no cover
             plt.plot(pot_r, head, label="head correction")
