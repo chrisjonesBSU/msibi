@@ -1,4 +1,5 @@
 import os
+form warnings import warn
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -35,7 +36,7 @@ class Pair(object):
         Values of the potential at every pot_r.
     """
 
-    def __init__(self, type1, type2, potential, head_correction_form="linear"):
+    def __init__(self, type1, type2, potential=None, head_correction_form="linear"):
         self.type1 = str(type1)
         self.type2 = str(type2)
         self.name = f"{self.type1}-{self.type2}"
@@ -43,9 +44,15 @@ class Pair(object):
         self._states = dict()
         if isinstance(potential, str):
             self.potential = np.loadtxt(potential)[:, 1]
-            # TODO: this could be dangerous
-        else:
+        elif isinstance(potential, numpy.ndarray):
             self.potential = potential
+        elif potential == None:
+            warn("Initial potential not created for "
+                f"pair {self.type1}-{self.type2}. "
+                "Set `derive_init_potential to True "
+                "when calling the optimize step."
+                )
+            self.potential = None 
         self.previous_potential = None
         self.head_correction_form = head_correction_form
 
@@ -93,7 +100,8 @@ class Pair(object):
         return np.stack((rdf.bin_centers, rdf.rdf*norm)).T
 
     def compute_current_rdf(self, state, smooth, verbose=False, query=True):
-
+        """
+        """
         rdf = self.get_state_rdf(state, query=query)
         self._states[state]["current_rdf"] = rdf
 

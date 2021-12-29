@@ -130,6 +130,7 @@ class MSIBI(object):
         n_iterations=10,
         start_iteration=0,
         n_steps=1e6,
+        derive_init_potential=False,
         engine="hoomd",
         _dir=None
     ):
@@ -153,6 +154,11 @@ class MSIBI(object):
         n_steps : int, default=1e6
             How many steps to run the query simulations
             The frequency to write trajectory information to query.gsd
+        derive_init_potential : boolean, default False
+            Set to True if you want to derive the initial pair potential
+            from the weighted Boltzmann inverse of the state-pair target RDFs.
+            If False, then the initial potential must be defined when creating
+            a new Pair object.
         engine : str, default "hoomd"
             Engine that runs the simulations.
 
@@ -170,6 +176,17 @@ class MSIBI(object):
         for pair in self.pairs:
             for state in self.states:
                 pair._add_state(state, smooth=self.smooth_rdfs)
+
+            ## Update initial potential here ##
+            if derive_init_potential is True:
+                initial_pot = np.zeros(len(self.opt_r))
+                for state in self.states:
+                    initial_pot += (-state.kT*np.log(
+                        pair._states[state]["target_rdf"][:,1]
+                    )*state.alpha
+                pair.potential = initial_pot
+            else:
+                assert pair.potential != None
 
         if self.bonds:
             for bond in self.bonds:
