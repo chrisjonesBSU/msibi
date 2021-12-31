@@ -56,13 +56,19 @@ class Pair(object):
         self.previous_potential = None
         self.head_correction_form = head_correction_form
 
+
     def _add_state(self, state, smooth=True):
         """Add a state to be used in optimizing this pair.
+        This shouldn't have to be called manually. All states are added
+        to each Pair when `MSIBI.optimize()` is called. 
 
         Parameters
         ----------
         state : msibi.state.State
             A state object created previously.
+        smooth : bool, defualt=True
+            Whether or not to smooth the taget RDF
+
         """
         target_rdf = self.get_state_rdf(state, query=False)
         if state._opt.smooth_rdfs:
@@ -82,6 +88,7 @@ class Pair(object):
             "path": state.dir
         }
 
+
     def get_state_rdf(self, state, query):
         """Calculate the RDF of a Pair at a State."""
         if query:
@@ -99,8 +106,12 @@ class Pair(object):
         )
         return np.stack((rdf.bin_centers, rdf.rdf*norm)).T
 
+
     def compute_current_rdf(self, state, smooth, verbose=False, query=True):
-        """
+        """Updates the 'current_rdf' value in the Pair's state dictionary.
+        Calculates and stores the fitness function 
+        of the current and target RDFs.
+
         """
         rdf = self.get_state_rdf(state, query=query)
         self._states[state]["current_rdf"] = rdf
@@ -121,7 +132,8 @@ class Pair(object):
 
         # Compute fitness function comparing the two RDFs.
         f_fit = calc_similarity(
-            rdf[:, 1], self._states[state]["target_rdf"][:, 1]
+            self._states[state]["current_rdf"][:, 1],
+            self._states[state]["target_rdf"][:, 1]
         )
         self._states[state]["f_fit"].append(f_fit)
 
@@ -137,6 +149,7 @@ class Pair(object):
             Current iteration step, used in the filename
         dr : float
             The RDF bin size
+
         """
         rdf = self._states[state]["current_rdf"]
         rdf[:, 0] -= dr / 2
@@ -145,6 +158,7 @@ class Pair(object):
             f"pair_{self.name}-state_{state.name}-step{iteration}.txt"
             ),
             rdf)
+
 
     def update_potential(self, pot_r, r_switch=None, verbose=False):
         """Update the potential using all states. """
@@ -198,6 +212,7 @@ class Pair(object):
             self.head_correction_form
         )
         head = self.potential
+
         if verbose:  # pragma: no cover
             plt.plot(pot_r, head, label="head correction")
             plt.plot(pot_r, pot, label="uncorrected potential")

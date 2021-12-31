@@ -1,4 +1,5 @@
 import os
+from warnings import warn
 
 import numpy as np
 
@@ -179,14 +180,24 @@ class MSIBI(object):
 
             ## Update initial potential here ##
             if derive_init_potential is True:
+                if pair.potential != None:
+                    warn("You passed in an initial potential for this pair, "
+                         "but setting `derive_init_potential` to True will "
+                         "override and create a new initial pair potential."
+                    )
                 initial_pot = np.zeros(len(self.opt_r))
                 for state in self.states:
                     initial_pot += (-state.kT*np.log(
                         pair._states[state]["target_rdf"][:,1]
-                    )*state.alpha
+                    )*state.alpha)
+
                 pair.potential = initial_pot
-            else:
-                assert pair.potential != None
+            elif derive_init_potential is False and pair.potential is None:
+                raise ValueError("The initial pair potentials were not set "
+                        "when the Pair() objects were created. You must either "
+                        "manually pass in initial potentials for each pair, or "
+                        "set `derive_init_potential` to True."
+                    )
 
         if self.bonds:
             for bond in self.bonds:
