@@ -185,7 +185,7 @@ class MSIBI(object):
                          "but setting `derive_init_potential` to True will "
                          "override and create a new initial pair potential."
                     )
-                initial_pot = np.zeros(len(self.opt_r))
+                initial_pot = np.zeros(len(self.pot_r))
                 for state in self.states:
                     initial_pot += (-state.kT*np.log(
                         pair._states[state]["target_rdf"][:,1]
