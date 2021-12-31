@@ -24,7 +24,7 @@ class BaseTest:
 
     @pytest.fixture
     def pair(self):
-        return Pair("0", "1", potential=mie(r, 1.0, 1.0))
+        return Pair("0", "1", mie(r, 1.0, 1.0), "linear")
 
     @pytest.fixture
     def rdf0(self):
