@@ -17,8 +17,6 @@ def morse(r, D, alpha, r0):
     """Morse pair potential. """
     return D * (np.exp(-2 * alpha * (r - r0)) - 2 * np.exp(-alpha * (r - r0)))
 
-def boltzmann_inverse(rdf_y, kT):
-    return -kT*np.log(rdf_y)
 
 def tail_correction(r, V, r_switch):
     """Apply a tail correction to a potential making it go to zero smoothly.
