@@ -1,5 +1,5 @@
 import os
-form warnings import warn
+from warnings import warn
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -44,7 +44,7 @@ class Pair(object):
         self._states = dict()
         if isinstance(potential, str):
             self.potential = np.loadtxt(potential)[:, 1]
-        elif isinstance(potential, numpy.ndarray):
+        elif isinstance(potential, np.ndarray):
             self.potential = potential
         elif potential == None:
             warn("Initial potential not created for "
