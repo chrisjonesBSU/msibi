@@ -119,7 +119,6 @@ class Pair(object):
         )
         self._states[state]["f_fit"].append(f_fit)
 
-
     def save_current_rdf(self, state, iteration, dr):
         """Save the current rdf
 

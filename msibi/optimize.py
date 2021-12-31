@@ -121,7 +121,6 @@ class MSIBI(object):
     def add_angle(self, angle):
         self.angles.append(angle)
 
-
     def optimize(
         self,
         integrator,
