@@ -64,7 +64,6 @@ class Pair(object):
             )
             negative_idx = np.where(target_rdf < 0)
             target_rdf[negative_idx] = 0
-            #SMOOTH AGAIN HERE - WHAT DOES THIS LOOK LIKE?
 
         self._states[state] = {
             "target_rdf": target_rdf,
@@ -95,8 +94,6 @@ class Pair(object):
 
     def compute_current_rdf(self, state, smooth, verbose=False, query=True):
         current_rdf = self.get_state_rdf(state, query=query)
-        self._states[state]["current_rdf"] = current_rdf
-        #current_rdf = self._states[state]["current_rdf"]
         if state._opt.smooth_rdfs:
             current_rdf[:, 1] = savitzky_golay(
                 current_rdf[:, 1], 9, 2, deriv=0, rate=1
@@ -104,8 +101,6 @@ class Pair(object):
             negative_idx = np.where(current_rdf < 0)
             current_rdf[negative_idx] = 0
 
-            #SMOOTH AGAIN HERE? WHAT DOES THIS LOOK LIKE?
-            #POSSIBLE DISCONTINUITY INTRODUCED?
             if verbose:  # pragma: no cover
                 plt.title(f"RDF smoothing for {state.name}")
                 plt.plot(rdf[:,0], rdf[:, 1], label="unsmoothed")
@@ -117,6 +112,7 @@ class Pair(object):
         f_fit = calc_similarity(
             current_rdf[:, 1], self._states[state]["target_rdf"][:, 1]
         )
+        self._states[state]["current_rdf"] = current_rdf
         self._states[state]["f_fit"].append(f_fit)
 
     def save_current_rdf(self, state, iteration, dr):
@@ -132,8 +128,6 @@ class Pair(object):
             The RDF bin size
         """
         rdf = self._states[state]["current_rdf"]
-        #WHAT IS THIS LINE DOING?
-        rdf[:, 0] -= dr / 2
         np.savetxt(os.path.join(
             state.dir,
             f"pair_{self.name}-state_{state.name}-step{iteration}.txt"
