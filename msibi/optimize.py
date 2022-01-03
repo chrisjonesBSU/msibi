@@ -180,7 +180,7 @@ class MSIBI(object):
                         pair._states[state]["target_rdf"][:,1]
                     )*state.alpha)
 
-                pair.potential = savitzky_golay(initial_pot, 15, 1, 0, 1)
+                pair.potential = initial_pot
 
         if self.bonds:
             for bond in self.bonds:
