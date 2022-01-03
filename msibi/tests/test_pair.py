@@ -19,6 +19,24 @@ class TestPair(BaseTest):
     def test_pair_name(self, pair):
         assert pair.name == "0-1"
 
+    def test_potential_none(self, state0, tmp_path):
+        opt = MSIBI(2.5, n_bins, smooth_rdfs=True)
+        with pytest.warns(UserWarning):
+            pair = Pair("0", "1", potential=None)
+        assert pair.potential == None
+
+        opt.add_pair(pair)
+        opt.add_state(state0)
+        opt.optimize(
+                n_iterations=0,
+                _dir=tmp_path,
+                integrator="hoomd.md.integrate.nvt",
+                integrator_kwargs={"tau": 0.1},
+                dt=0.001,
+                gsd_period=1000
+            )
+        assert isinstance(pair.potential, np.ndarray)
+
     def test_save_table_potential(self, tmp_path):
         pair = Pair("A", "B", potential=mie(r, 1.0, 1.0))
         pair.potential_file = os.path.join(tmp_path, "pot.txt")

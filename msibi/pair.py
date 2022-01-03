@@ -25,11 +25,17 @@ class Pair(object):
         The name of one particle type on the particle pair.
         Must match the names found in the State's .gsd trajectory file.
         See  gsd.hoomd.ParticleData.types
-    potential :
-
+    potential : 1D numpy array or None   
+        Values of the potential at every pot_r.
+        Leave as None to derive an initial potential from the weighted average
+        of the Boltzmann inverse from each State's target RDF.
 
     Attributes
     ----------
+    type1 : str
+        Name/type of the first particle in this pair.
+    type2 : 
+        Name/type of the second particle in this pair.
     name : str
         Pair name.
     potential : 1D numpy array   
