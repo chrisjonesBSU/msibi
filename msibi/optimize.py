@@ -5,6 +5,7 @@ import numpy as np
 
 from msibi.potentials import tail_correction
 from msibi.utils.exceptions import UnsupportedEngine
+from msibi.utils.smoothing import savitzky_golay
 from msibi.workers import run_query_simulations
 
 
@@ -179,7 +180,7 @@ class MSIBI(object):
                         pair._states[state]["target_rdf"][:,1]
                     )*state.alpha)
 
-                pair.potential = initial_pot
+                pair.potential = savitzky_golay(initial_pot, 15, 1, 0, 1)
 
         if self.bonds:
             for bond in self.bonds:
