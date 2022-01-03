@@ -131,7 +131,6 @@ class MSIBI(object):
         n_iterations=10,
         start_iteration=0,
         n_steps=1e6,
-        derive_init_potential=False,
         engine="hoomd",
         _dir=None
     ):
@@ -155,11 +154,6 @@ class MSIBI(object):
         n_steps : int, default=1e6
             How many steps to run the query simulations
             The frequency to write trajectory information to query.gsd
-        derive_init_potential : boolean, default False
-            Set to True if you want to derive the initial pair potential
-            from the weighted Boltzmann inverse of the state-pair target RDFs.
-            If False, then the initial potential must be defined when creating
-            a new Pair object.
         engine : str, default "hoomd"
             Engine that runs the simulations.
 
@@ -178,13 +172,7 @@ class MSIBI(object):
             for state in self.states:
                 pair._add_state(state, smooth=self.smooth_rdfs)
 
-            ## Update initial potential here ##
-            if derive_init_potential is True:
-                if pair.potential != None:
-                    warn("You passed in an initial potential for this pair, "
-                         "but setting `derive_init_potential` to True will "
-                         "override and create a new initial pair potential."
-                    )
+            if pair.potential is None:
                 initial_pot = np.zeros(len(self.pot_r))
                 for state in self.states:
                     initial_pot += (-state.kT*np.log(
@@ -192,12 +180,6 @@ class MSIBI(object):
                     )*state.alpha)
 
                 pair.potential = initial_pot
-            elif derive_init_potential is False and pair.potential is None:
-                raise ValueError("The initial pair potentials were not set "
-                        "when the Pair() objects were created. You must either "
-                        "manually pass in initial potentials for each pair, or "
-                        "set `derive_init_potential` to True."
-                    )
 
         if self.bonds:
             for bond in self.bonds:

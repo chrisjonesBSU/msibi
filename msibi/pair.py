@@ -32,7 +32,7 @@ class Pair(object):
     ----------
     name : str
         Pair name.
-    potential : func
+    potential : 1D numpy array   
         Values of the potential at every pot_r.
     """
 
@@ -42,20 +42,17 @@ class Pair(object):
         self.name = f"{self.type1}-{self.type2}"
         self.potential_file = ""
         self._states = dict()
-        if isinstance(potential, str):
-            self.potential = np.loadtxt(potential)[:, 1]
-        elif isinstance(potential, np.ndarray):
+        if isinstance(potential, np.ndarray):
             self.potential = potential
         elif potential == None:
             warn("Initial potential not created for "
                 f"pair {self.type1}-{self.type2}. "
-                "Set `derive_init_potential to True "
-                "when calling the optimize step."
+                "The initial potential will be created by "
+                "the Boltzmann inverse of the target RDFs."
                 )
             self.potential = None 
         self.previous_potential = None
         self.head_correction_form = head_correction_form
-
 
     def _add_state(self, state, smooth=True):
         """Add a state to be used in optimizing this pair.
