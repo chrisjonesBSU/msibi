@@ -16,6 +16,22 @@ HOOMD_TABLE_ENTRY = """
 table.set_from_file('{type1}', '{type2}', filename='{potential_file}')
 """
 
+HOOMD_BOND_TABLE_INIT = """
+bond_table = hoomd.md.bond.table(width={1:d})
+"""
+
+HOOMD_ANGLE_TABLE_INIT = """
+angle_table = hoomd.md.angle.table(width={1:d})
+"""
+
+HOOMD_BOND_TABLE_ENTRY = """
+bond_table.set_from_file({name}, {table_pot})
+"""
+
+HOOMD_ANGLE_TABLE_ENTRY = """
+angle_table.set_from_file({name}, {table_pot})
+"""
+
 HOOMD_BOND_INIT = """
 harmonic_bond = hoomd.md.bond.harmonic()
 """
