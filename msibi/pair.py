@@ -8,7 +8,7 @@ from msibi.potentials import alpha_array, head_correction, tail_correction
 from msibi.utils.error_calculation import calc_similarity
 from msibi.utils.exceptions import UnsupportedEngine
 from msibi.utils.general import find_nearest
-from msibi.utils.smoothing import savitzky_golay
+from msibi.utils.smoothing import savitzky_golay, running_average
 
 
 class Pair(object):
@@ -177,7 +177,7 @@ class Pair(object):
 
         # Apply corrections to ensure continuous, well-behaved potentials.
         pot = self.potential
-        first_smooth_pot = savitzky_golay(self.potential, 15, 1, 0, 1)
+        first_smooth_pot = running_average(self.potential, 3)
         self.potential = tail_correction(pot_r, first_smooth_pot, r_switch)
         tail = self.potential
         self.potential = head_correction(
@@ -186,7 +186,7 @@ class Pair(object):
             self.previous_potential,
             self.head_correction_form
         )
-        second_smooth_pot = savitzky_golay(self.potential, 15, 1, 0, 1)
+        second_smooth_pot = running_average(self.potential, 3)
         self.potential = second_smooth_pot
         head = self.potential
         if verbose:  # pragma: no cover
