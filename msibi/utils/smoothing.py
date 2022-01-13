@@ -3,6 +3,9 @@ from math import factorial
 import numpy as np
 
 
+def running_average(y, window_size):
+    return np.concolve(y, np.ones(window_size, "valid") / window_size
+
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     """
 
