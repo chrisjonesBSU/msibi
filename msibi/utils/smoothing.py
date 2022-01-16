@@ -4,7 +4,7 @@ import numpy as np
 
 
 def running_average(y, window_size):
-    return np.convolve(y, np.ones(window_size, "same")) / window_size
+    return np.convolve(y, np.ones(window_size), "same") / window_size
 
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     """
