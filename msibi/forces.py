@@ -176,8 +176,8 @@ class Force(object):
         self.x_range = f[:,0]
         self.dx = np.round(self.x_range[1] - self.x_range[0], 3) 
         self.potential = f[:,1]
-        self.x_min = self.l_range[0]
-        self.x_max = self.l_range[-1] + self.dx
+        self.x_min = self.x_range[0]
+        self.x_max = self.x_range[-1] + self.dx
 
         self.format = "table"
         self.force_init = f"btable = hoomd.md.bond.table(width={self.nbins})"
