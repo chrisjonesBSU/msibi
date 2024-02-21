@@ -27,6 +27,8 @@ class Force(object):
     def __init__(self, name, optimize=False, head_correction_form="linear"):
         self.name = name 
         self.optimize = optimize
+        self._hoomd_force = None
+        self._force_params = None
         self.head_correction_form = head_correction_form
         self.format = None
         self.xmin = None
@@ -51,6 +53,7 @@ class Force(object):
                 + f"Name: {self.name}; "
                 + f"Optimize: {self.optimize}"
         )
+
     @property
     def potential(self):
         return self._potential
@@ -58,17 +61,24 @@ class Force(object):
     @potential.setter
     def potential(self, array):
         self._potential = array
-    
+    #TODO: This only works for table potentials 
     @property
     def force(self):
-        return -1.0*np.gradient(self.potential, self.dx)
+        if self.optimize:
+            return -1.0*np.gradient(self.potential, self.dx)
+        else:
+            return None
 
     @property
     def smoothing_window(self):
-        return self._smoothing_window
+        if self.optimize: 
+            return self._smoothing_window
+        else:
+            return None
 
     @smoothing_window.setter
     def smoothing_window(self, value):
+        """Set the smoothing window and calculate target distribution."""
         self._smoothing_window = value
         for state in self._states:
             self._add_state(state)
@@ -79,6 +89,7 @@ class Force(object):
 
     @smoothing_order.setter
     def smoothing_order(self, value):
+        """Set the smoothing order and calculate target distribution."""
         self._smoothing_order = value
         for state in self._states:
             self._add_state(state)
@@ -89,9 +100,83 @@ class Force(object):
 
     @nbins.setter
     def nbins(self, value):
+        """Set nbins used for target distribution calculation."""
         self._nbins =  value
         for state in self._states:
             self._add_state(state)
+
+    @property
+    def hoomd_force(self):
+        """The hoomd_force property."""
+        return self._hoomd_force
+
+    @hoomd_force.setter
+    def hoomd_force(self, value):
+        self._hoomd_force = value
+
+    def set_quadratic(self, k4, k3, k2, x0, x_min, x_max, n_points=101):
+        """Set a potential based on the following function:
+
+            V(x) = k4(x-x0)^4 + k3(x-x0)^3 + k2(x-x0)^2
+
+        Using this method will create a table potential V(x) over the range
+        x_min - x_max.
+
+        This should be the potential form of choice when setting an initial 
+        guess potential for the force to be optimized.
+
+        Parameters
+        ----------
+        x0, k4, k3, k2 : float, required
+            The paraters used in the V(x) function described above
+        x_min : float, required
+            The lower bound of the bond potential lengths
+        x_max : float, required
+            The upper bound of the bond potential lengths
+        n_points : int, default = 101 
+            The number of points between l_min-l_max used to create
+            the table potential
+
+        """
+        self.format = "table"
+        self.x_min = x_min
+        self.x_max = x_max
+        self.dx = x_max / self.nbins
+        self.x_range = np.arange(x_min, x_max, self.dx)
+        self.potential = quadratic_spring(self.x_range, x0, k4, k3, k2)
+        if isinstance(self, msibi.forces.Angle):
+            if x0 !=0 or not np.allclose(x_max, np.pi, atol=1e-5):
+                raise ValueError(
+                        "For angle potentials, x_min must be 0 "
+                        "and x_max must be pi."
+                )
+
+    def set_from_file(self, file_path):
+        """Creates a potential from a text file.
+        The columns of the text file must be in the order of r, V.
+        where r is the independent value (i.e. distance) and V
+        is the potential enregy at r. The force will be calculated
+        from r and V using np.gradient().
+
+        Use this potential setter to set a potential from a previous MSIBI run.
+        For example, use the final potential files from a bond-optimization IBI
+        run to set a static coarse-grained bond potential while you perform
+        IBI runs on angle and pair potentials.
+
+        Parameters:
+        -----------
+        file_path : str, required
+            The full path to the table potential text file.
+
+        """
+        self._potential_file = file_path
+        f = np.loadtxt(self._potential_file)
+        self.x_range = f[:,0]
+        self.dx = np.round(self.x_range[1] - self.x_range[0], 3) 
+        self.x_min = self.x_range[0]
+        self.x_max = self.x_range[-1] + self.dx
+        self._potential = f[:,1]
+        self.format = "table"
 
     def target_distribution(self, state):
         return self._states[state]["target_distribution"]
@@ -129,67 +214,6 @@ class Force(object):
         """"""
         return self._calc_fit(state)
     
-    def set_quadratic(self, k4, k3, k2, x0, x_min, x_max, n_points=101):
-        """Set a potential based on the following function:
-
-            V(x) = k4(l-x0)^4 + k3(l-x0)^3 + k2(l-x0)^2
-
-        Using this method will create a table potential V(x) over the range
-        x_min - x_max.
-
-        This should be the potential form of choice when setting an initial 
-        guess potential for the force to be optimized.
-
-        Parameters
-        ----------
-        x0, k4, k3, k2 : float, required
-            The paraters used in the V(x) function described above
-        x_min : float, required
-            The lower bound of the bond potential lengths
-        x_max : float, required
-            The upper bound of the bond potential lengths
-        n_points : int, default = 101 
-            The number of points between l_min-l_max used to create
-            the table potential
-
-        """
-        self.format = "table"
-        self.x_min = x_min
-        self.x_max = x_max
-        self.dx = x_max / self.nbins
-        self.x_range = np.arange(x_min, x_max, self.dx)
-        self.potential = quadratic_spring(self.x_range, x0, k4, k3, k2)
-        self.force_init = "Table"
-        self.force_entry = self._table_entry()
-
-    def set_from_file(self, file_path):
-        """Creates a potential from a text file.
-        The columns of the text file must be in the order of r, V.
-        where r is the independent value (i.e. distance) and V
-        is the potential enregy at r. The force will be calculated
-        from r and V using np.gradient().
-
-        Use this potential setter to set a potential from a previous MSIBI run.
-        For example, use the final potential files from a bond-optimization IBI
-        run to set a static coarse-grained bond potential while you perform
-        IBI runs on angle and pair potentials.
-
-        Parameters:
-        -----------
-        file_path : str, required
-            The full path to the table potential text file.
-
-        """
-        self._potential_file = file_path
-        f = np.loadtxt(self._potential_file)
-        self.x_range = f[:,0]
-        self.dx = np.round(self.x_range[1] - self.x_range[0], 3) 
-        self.x_min = self.x_range[0]
-        self.x_max = self.x_range[-1] + self.dx
-        self._potential = f[:,1]
-        self.format = "table" #TODO: Still using format attribute?
-        self.force_init = "Table"
-        self.force_entry = self.table_entry()
 
     def _add_state(self, state):
         """Add a state to be used in optimizing this Fond.
@@ -309,6 +333,14 @@ class Bond(Force):
                 head_correction_form=head_correction_form
         )
 
+    @property
+    def _force_params(self):
+        return self._force_params
+
+    @_force_params.setter
+    def _force_params(self, params):
+        self._force_params = params
+
     def set_harmonic(self, r0, k):
         """Sets a fixed harmonic bond potential.
         Using this method is not compatible force msibi.forces.Force
@@ -329,8 +361,10 @@ class Bond(Force):
                     "set_from_file() or set_quadratic()."
             )
         self.type = "static"
-        self.force_init = "Harmonic"
-        self.force_entry = dict(r0=r0, k=k)
+        self._force_entry = dict(k=k, r0=r0)
+        #TODO: Remove these?
+        bond = hoomd.md.bond.Harmonic()
+        bond.params[self.name] = dict(k=k, r0=r0)
     
     def _table_entry(self):
         table_entry = {

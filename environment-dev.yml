@@ -1,0 +1,9 @@
+name: msibi 
+channels:
+  - conda-forge
+dependencies:
+  - flowermd
+  - pip
+  - pytest
+  - pytest-cov
+  - jupyter

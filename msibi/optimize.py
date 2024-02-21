@@ -219,7 +219,7 @@ class MSIBI(object):
                 )
             )
             print()
-
+    # CREATE FORCE LIST
     def _initialize(self, potentials_dir):
         """Create initial table potentials and the simulation input scripts.
 
