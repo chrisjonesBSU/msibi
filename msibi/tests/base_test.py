@@ -44,7 +44,7 @@ class BaseTest:
                 alpha=1.0,
                 kT=4.0,
                 traj_file=os.path.join(test_assets, "AB-4.0kT.gsd"),
-                n_frames=100,
+                n_frames=10,
                 _dir=tmp_path
         )
         return state 
