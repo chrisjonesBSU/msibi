@@ -284,3 +284,15 @@ class TestDihedral(BaseTest):
         path = os.path.join(tmp_path, "ABAA_dihedral.csv")
         dihedral.save_potential(path)
         assert os.path.isfile(path)
+
+    def test_save_potential_history(self, msibi, bond):
+        bond = bond(optimize=True)
+        bond.set_quadratic(x_min=0.0, x_max=3.0, x0=1, k2=200, k3=0, k4=0)
+        msibi.add_force(bond)
+        msibi.run_optimization(n_steps=100, n_iterations=2)
+        assert len(bond.potential_history) == 2
+        bond.save_potential_history("test.npy")
+        assert os.path.isfile("test.npy")
+        pot_history = np.load("test.npy")
+        assert pot_history.shape == (2, bond.nbins + 1, 2)
+        os.remove("test.npy")

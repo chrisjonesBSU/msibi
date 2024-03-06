@@ -224,7 +224,8 @@ class Force(object):
                 "This force is not a table potential and "
                 "cannot be saved to file."
             )
-        save_array = np.dstack(self.x_range, self.potential_history)
+        x_range_list = [self.x_range for i in range(len(self.potential_history))]
+        save_array = np.dstack([x_range_list, self.potential_history])
         np.save(file_path, save_array)
 
     def save_state_data(self, state: msibi.state.State, file_path: str) -> None:
@@ -621,7 +622,7 @@ class Force(object):
         self._potential, real, head_cut, tail_cut = self._correction_function(
             self.x_range, self.potential, self.correction_form
         )
-        self.potential_history.append(np.copy(self.potential))
+        #self.potential_history.append(np.copy(self.potential))
         self._head_correction_history.append(np.copy(self.potential[0:head_cut]))
         self._tail_correction_history.append(np.copy(self.potential[tail_cut:]))
         self._learned_potential_history.append(np.copy(self.potential[real]))

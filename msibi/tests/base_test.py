@@ -49,87 +49,56 @@ class BaseTest:
         )
         return state 
 
+    @pytest.fixture()
+    def pair(self):
+        def _pair(optimize=False, type1="A", type2="A"):
+            pair = Pair(
+                    type1=type1,
+                    type2=type2,
+                    r_cut=3.0,
+                    nbins=100,
+                    optimize=optimize,
+                    exclude_bonded=True
+            )
+            pair.set_lj(sigma=2, epsilon=2, r_cut=3.0, r_min=0.1)
+            return pair
+        return _pair
 
-    @pytest.fixture
-    def pairA(self):
-        pair = Pair(
-                type1="A",
-                type2="A",
-                r_cut=3.0,
-                nbins=100,
-                optimize=False,
-                exclude_bonded=True
-        )
-        pair.set_lj(sigma=2, epsilon=2, r_cut=3.0, r_min=0.1)
-        return pair
-
-    @pytest.fixture
-    def pairB(self):
-        pair = Pair(
-                type1="B",
-                type2="B",
-                r_cut=3.0,
-                nbins=100,
-                optimize=False,
-                exclude_bonded=True
-        )
-        pair.set_lj(sigma=1.5, epsilon=1, r_cut=3.0, r_min=0.1)
-        return pair
-
-    @pytest.fixture
-    def pairAB(self):
-        pair = Pair(
-                type1="A",
-                type2="B",
-                r_cut=3.0,
-                nbins=100,
-                optimize=False,
-                exclude_bonded=True
-        )
-        pair.set_lj(sigma=1.5, epsilon=1, r_cut=3.0, r_min=0.1)
-        return pair
-    
-    @pytest.fixture
+    @pytest.fixture()
     def bond(self):
-        bond = Bond(
-            type1="A",
-            type2="B",
-            optimize=False,
-            nbins=100
-        )
-        return bond
+        def _bond(optimize=False, type1="A", type2="A"):
+            bond = Bond(
+                    type1=type1,
+                    type2=type2,
+                    optimize=optimize,
+                    nbins=100
+            )
+            return bond
+        return _bond
 
-    @pytest.fixture
+    @pytest.fixture()
     def angle(self):
-        angle = Angle(
-                type1="A",
-                type2="B",
-                type3="A",
-                optimize=False,
-                nbins=100
-        )
-        return angle
+        def _angle(optimize=False, type1="A", type2="B", type3="A"):
+            angle = Angle(
+                    type1=type1,
+                    type2=type2,
+                    type3=type3,
+                    optimize=optimize,
+                    nbins=100
+            )
+            return angle
+        return _angle
 
     @pytest.fixture
     def dihedral(self):
-        dihedral = Dihedral(
-                    type1="A",
-                    type2="B",
-                    type3="A",
-                    type4="B",
-                    optimize=False,
+        def _dihedral(optimize=False, type1="A", type2="B", type3="A", type4="B"):
+            dihedral = Dihedral(
+                    type1=type1,
+                    type2=type2,
+                    type3=type3,
+                    type4=type4,
+                    optimize=optimize,
                     nbins=100
-        )
-        return dihedral 
-
-    @pytest.fixture
-    def rdfAA(self):
-        return self.get_rdf(0)
-
-    @pytest.fixture
-    def rdfBB(self):
-        pass
-
-    @pytest.fixture
-    def rdfAB(self):
-        pass
+            )
+            return dihedral
+        return _dihedral
