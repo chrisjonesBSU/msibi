@@ -201,7 +201,7 @@ class Force(object):
         if self.format != "table":
             raise RuntimeError(
                 "This force is not a table potential and "
-                "cannot be saved to a .txt file."
+                "cannot be saved to file."
             )
         df = pd.DataFrame({
             "x": self.x_range,
@@ -222,9 +222,10 @@ class Force(object):
         if self.format != "table":
             raise RuntimeError(
                 "This force is not a table potential and "
-                "cannot be saved to a .txt file."
+                "cannot be saved to file."
             )
-        np.save(file_path, np.asarray(self.potential_history))
+        save_array = np.dstack(self.x_range, self.potential_history)
+        np.save(file_path, save_array)
 
     def save_state_data(self, state: msibi.state.State, file_path: str) -> None:
         """Save the distribution data of a state as a a dictionary to a `npz` file.
@@ -245,7 +246,6 @@ class Force(object):
             "f_fit": np.asarray(state_dict["f_fit"])
         }
         np.savez(file_path, **state_data)
-
 
     def target_distribution(self, state: msibi.state.State) -> np.ndarray:
         """The target structural distribution corresponding to this foce.
