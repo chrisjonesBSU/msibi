@@ -618,7 +618,6 @@ class Force(object):
                     kT * np.log(current_dist[:, 1] / target_dist[:, 1]) / N
             )
         # TODO: Add correction funcs to Force classes
-        # TODO: Smoothing potential before doing head and tail corrections?
         self._potential, real, head_cut, tail_cut = self._correction_function(
             self.x_range, self.potential, self.correction_form
         )
