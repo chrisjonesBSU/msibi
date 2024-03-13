@@ -9,6 +9,7 @@ from .base_test import BaseTest
 
 class TestForce(BaseTest):
     def test_dx(self, bond):
+        bond = bond()
         bond.set_quadratic(
                 x0=2,
                 k4=1,
@@ -20,6 +21,7 @@ class TestForce(BaseTest):
         assert bond.dx == 0.03
 
     def test_potential_setter(self, bond):
+        bond = bond(optimize=True)
         bond.set_quadratic(
                 x0=2,
                 k4=0,
@@ -34,6 +36,7 @@ class TestForce(BaseTest):
         assert bond.format == "table"
 
     def test_smooth_potential(self, bond):
+        bond = bond(optimize=True)
         bond.set_quadratic(
                 x0=2,
                 k4=0,
@@ -82,19 +85,22 @@ class TestForce(BaseTest):
             angle.plot_fit_scores(state=stateY)
 
     def test_smoothing_window(self, bond):
+        bond = bond()
         bond.smoothing_window = 5
         assert bond.smoothing_window == 5
 
     def test_smoothing_order(self, bond):
+        bond = bond()
         bond.smoothing_order = 3
         assert bond.smoothing_order == 3
 
     def test_nbins(self, bond):
+        bond = bond()
         bond.nbins = 60
         assert bond.nbins == 60
 
-    def test_set_potential_error(self):
-        bond = Bond(type1="A", type2="B", optimize=False)
+    def test_set_potential_error(self, bond):
+        bond = bond(optimize=False)
         bond.set_harmonic(k=500, r0=2)
         with pytest.raises(ValueError):
             bond.potential = np.array([1, 2, 3])
@@ -113,6 +119,7 @@ class TestForce(BaseTest):
             bond.force
 
     def test_bad_smoothing_args(self, bond):
+        bond = bond()
         with pytest.raises(ValueError):
             bond.smoothing_window = 0
         with pytest.raises(ValueError):
@@ -138,15 +145,18 @@ class TestForce(BaseTest):
 
 class TestBond(BaseTest):
     def test_bond_name(self, bond):
+        bond = bond(type1="A", type2="B", optimize=False)
         assert bond.name == "A-B"
 
     def test_set_harmonic(self, bond):
+        bond = bond()
         bond.set_harmonic(k=500, r0=2)
         assert bond.format == "static"
         assert bond.force_entry["k"] == 500
         assert bond.force_entry["r0"] == 2 
 
     def test_set_quadratic(self, bond):
+        bond = bond()
         bond.set_quadratic(
                 x0=1.5,
                 k4=0,
@@ -161,6 +171,7 @@ class TestBond(BaseTest):
         assert np.around(bond.x_range[-1], 1) == 3.0
 
     def test_save_table_potential(self, tmp_path, bond):
+        bond = bond()
         bond.set_quadratic(
                 x0=2,
                 k4=1,
@@ -176,16 +187,19 @@ class TestBond(BaseTest):
 
 class TestAngle(BaseTest):
     def test_angle_name(self, angle):
+        angle = angle()
         assert angle.name == "A-B-A"
         assert angle.optimize is False
 
     def test_set_angle_harmonic(self, angle):
+        angle = angle()
         angle.set_harmonic(k=500, t0=2)
         assert angle.format == "static"
         assert angle.force_entry["t0"] == 2
         assert angle.force_entry["k"] == 500 
 
     def test_set_quadratic(self, angle):
+        angle = angle()
         angle.set_quadratic(
                 x0=2,
                 k4=0,
@@ -200,6 +214,7 @@ class TestAngle(BaseTest):
         assert np.allclose(angle.x_range[-1], np.pi, atol=1e-3)
 
     def test_save_angle_potential(self, tmp_path, angle):
+        angle = angle()
         angle.set_quadratic(
                 x0=2,
                 k4=0,
@@ -214,43 +229,48 @@ class TestAngle(BaseTest):
 
 
 class TestPair(BaseTest):
-    def test_pair_name(self, pairAB):
-        assert pairAB.name == "A-B"
-        assert pairAB._pair_name == ("A", "B")
-        assert pairAB.optimize is False
+    def test_pair_name(self, pair):
+        pair = pair(type1="A", type2="B", optimize=False)
+        assert pair.name == "A-B"
+        assert pair._pair_name == ("A", "B")
+        assert pair.optimize is False
 
-    def test_set_lj(self, pairAB):
-        pairAB.set_lj(
+    def test_set_lj(self, pair):
+        pair = pair(type1="A", type2="B", optimize=False)
+        pair.set_lj(
                 r_min=0.1,
                 r_cut=3.0,
                 epsilon=1.0,
                 sigma=1.0
         )
-        assert pairAB.format == "table"
-        assert pairAB._table_entry()["r_min"] == 0.1
-        assert len(pairAB._table_entry()["U"]) == len(pairAB.x_range)
-        assert len(pairAB._table_entry()["F"]) == len(pairAB.x_range)
-        assert pairAB.x_range[0] == 0.1
-        assert pairAB.x_range[-1] == 3.0
+        assert pair.format == "table"
+        assert pair._table_entry()["r_min"] == 0.1
+        assert len(pair._table_entry()["U"]) == len(pair.x_range)
+        assert len(pair._table_entry()["F"]) == len(pair.x_range)
+        assert pair.x_range[0] == 0.1
+        assert pair.x_range[-1] == 3.0
 
-    def test_save_angle_potential(self, tmp_path, pairAB):
-        pairAB.set_lj(
+    def test_save_angle_potential(self, tmp_path, pair):
+        pair = pair(type1="A", type2="B", optimize=False)
+        pair.set_lj(
                 r_min=0.1,
                 r_cut=3.0,
                 epsilon=1.0,
                 sigma=1.0
         )
         path = os.path.join(tmp_path, "AB_pair.csv")
-        pairAB.save_potential(path)
+        pair.save_potential(path)
         assert os.path.isfile(path)
 
 
 class TestDihedral(BaseTest):
     def test_dihedral_name(self, dihedral):
+        dihedral = dihedral(optimize=False)
         assert dihedral.name == "A-B-A-B"
         assert dihedral.optimize is False
 
     def test_set_dihedral_harmonic(self, dihedral):
+        dihedral = dihedral(optimize=False)
         dihedral.set_harmonic(k=500, phi0=0, d=-1, n=1)
         assert dihedral.format == "static"
         assert dihedral.force_entry["phi0"] == 0 
@@ -259,6 +279,7 @@ class TestDihedral(BaseTest):
         assert dihedral.force_entry["n"] == 1 
 
     def test_set_dihedral_quadratic(self, dihedral):
+        dihedral = dihedral(optimize=True)
         dihedral.set_quadratic(
                 x0=0,
                 k4=0,
@@ -272,7 +293,8 @@ class TestDihedral(BaseTest):
         assert np.allclose(dihedral.x_range[0], -np.pi, atol=1e-3)
         assert np.allclose(dihedral.x_range[-1], np.pi, atol=1e-3)
 
-    def test_save_angle_potential(self, tmp_path, dihedral):
+    def test_save_dihedral_potential(self, tmp_path, dihedral):
+        dihedral = dihedral(optimize=True)
         dihedral.set_quadratic(
                 x0=0,
                 k4=0,
