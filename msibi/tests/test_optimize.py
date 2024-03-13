@@ -21,7 +21,11 @@ class TestMSIBI(BaseTest):
         assert msibi.states[1] == stateY
         assert len(msibi.states) == 2
 
-    def test_add_forces(self, msibi, pairA, bond, angle, dihedral):
+    def test_add_forces(self, msibi, pair, bond, angle, dihedral):
+        bond = bond()
+        pairA = pair(type1="A", type2="A")
+        angle = angle()
+        dihedral = dihedral()
         msibi.add_force(pairA)
         msibi.add_force(bond)
         msibi.add_force(angle)
@@ -50,7 +54,7 @@ class TestMSIBI(BaseTest):
         ff = msibi._build_force_objects()
         assert len(ff) == 1
         assert len(bond.distribution_history(state=stateX)) == 1
-        assert len(bond.potential_history) == 2
+        assert len(bond.potential_history) == 1
         assert len(bond._head_correction_history) == 1
         assert len(bond._tail_correction_history) == 1
         assert len(bond._learned_potential_history) == 1
