@@ -30,7 +30,7 @@ def lennard_jones(r, epsilon, sigma):
     return mie(r=r, epsilon=epsilon, sigma=sigma, m=12, n=6)
 
 
-def pair_correction(r, V, form, r_switch=2.5):
+def pair_correction(r, V, form, r_switch=3.8):
     if form == "linear":
         head_correction_function = linear_head_correction
         tail_correction_function = pair_tail_correction
@@ -145,7 +145,8 @@ def pair_tail_correction(r, V, r_switch):
             * (r_cut ** 2 + 2 * r ** 2 - 3 * r_switch ** 2)
             / (r_cut ** 2 - r_switch ** 2) ** 3
     )
-    return V * S_r
+    return V
+    #return V * S_r
 
 
 def pair_head_correction(r, V, previous_V=None, form="linear"):

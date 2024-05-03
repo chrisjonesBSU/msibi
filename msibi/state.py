@@ -5,6 +5,7 @@ import warnings
 
 import gsd.hoomd
 import hoomd
+import numpy as np
 
 
 class State(object):
@@ -54,6 +55,10 @@ class State(object):
         self.name = name
         self.kT = kT
         self.traj_file = os.path.abspath(traj_file)
+        with gsd.hoomd.open(self.traj_file) as traj:
+            snap = traj[-1]
+            box_lengths = snap.configuration.box[:3]
+            self.box_length = np.min(box_lengths)
         self._n_frames = n_frames
         self._opt = None
         self._alpha = float(alpha)

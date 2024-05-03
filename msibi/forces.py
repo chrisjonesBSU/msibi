@@ -974,14 +974,22 @@ class Pair(Force):
             A_name=self.type1,
             B_name=self.type2,
             r_min=self.x_min,
+            #r_max=(state.box_length / 2) - 0.1,
             r_max=self.r_cut,
             exclude_bonded=state.exclude_bonded,
             start=-state.n_frames,
             stop=-1,
             bins=self.nbins + 1
         )
+        #_x = rdf.bin_centers
+        #_y = rdf.rdf * N
+        #keep_indices = np.where(_x <= self.r_cut)[0]
+        #x = np.ones_like(rdf.bin_centers)
+        #y = np.ones_like(rdf.rdf)
+        #x[keep_indices] = _x[keep_indices]
+        #y[keep_indices] = _y[keep_indices]
         x = rdf.bin_centers
-        y = rdf.rdf * N
+        y = rdf.rdf
         dist = np.vstack([x, y])
         return dist.T
 
