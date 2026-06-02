@@ -39,7 +39,11 @@ Resources
 
 Citation
 ========
-If you use the ``msibi`` python package in your research, please cite the following paper:
+
+If you use this package, please cite the following papers. The BibTeX references are:
+
+
+This paper discusses the design and implementation of MSIBI
 
 .. code-block:: bibtex
 
@@ -52,6 +56,23 @@ If you use the ``msibi`` python package in your research, please cite the follow
          number = "22",
          doi = "http://dx.doi.org/10.1063/1.4880555"
    }
+
+
+This paper discusses this python package that implements the MSIBI method 
+
+.. code-block:: bibtex
+
+  @article{Jones2026,
+      doi={10.21105/joss.09244},
+      url={https://doi.org/10.21105/joss.09244},
+      year={2026},
+      publisher={The Open Journal},
+      volume={11},
+      number={119},
+      pages={9244},
+      author={Jones, Chris D. and Almarashi, Mazin and Albooyeh, Marjan and Jankowski, Eric and McCabe, Clare},
+      title={msibi: Multistate Iterative Boltzmann Inversion}, journal = {Journal of Open Source Software} 
+  } 
 
 
 Indices and tables
