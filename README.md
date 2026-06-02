@@ -176,8 +176,8 @@ This paper discusses the python package that runs MSIBI optimizations
     number={119},
     pages={9244},
     author={Jones, Chris D. and Almarashi, Mazin and Albooyeh, Marjan and Jankowski, Eric and McCabe, Clare},
-    title={msibi: Multistate Iterative Boltzmann Inversion}, journal = {Journal of Open Source Software} 
-} 
+    title={msibi: Multistate Iterative Boltzmann Inversion}, journal = {Journal of Open Source Software}
+}
 ```
 
 ## Contributing to msibi
