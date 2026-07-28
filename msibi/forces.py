@@ -73,9 +73,12 @@ class Force:
         The window size used in SciPy's savgol_filter method.
     smoothing_order : int, optional
         The smoothing order used in SciPy's savgol_filter method.
-    correction_fit_window: int, optional
+    correction_fit_window: int, optional default None
         The window size (number of data points) to use when fitting
         the iterative potential to head and tail correction forms.
+        When None (the default), the window is chosen automatically by
+        sweeping candidate windows and keeping the most stable fit, so
+        it does not need to be tuned by hand.
         This is only used when the Force is set to be optimized.
     maxfev : int, optional
         Sets the maximum number of attemps when using scipy.curve_fit
@@ -803,9 +806,12 @@ class Bond(Force):
         The window size used in SciPy's savgol_filter method.
     smoothing_order : int, optional default 2
         The smoothing order used in SciPy's savgol_filter method.
-    correction_fit_window: int, optional default 10
+    correction_fit_window: int, optional default None
         The window size (number of data points) to use when fitting
         the iterative potential to head and tail correction forms.
+        When None (the default), the window is chosen automatically by
+        sweeping candidate windows and keeping the most stable fit, so
+        it does not need to be tuned by hand.
         This is only used when the Force is set to be optimized.
     maxfev : int, optional default 3000
         Sets the maximum number of attemps when using scipy.curve_fit
@@ -825,7 +831,7 @@ class Bond(Force):
         nbins: Optional[int] = None,
         smoothing_window: Optional[int] = 15,
         smoothing_order: Optional[int] = 2,
-        correction_fit_window: Optional[int] = 10,
+        correction_fit_window: Optional[int] = None,
         maxfev: Optional[int] = 1000,
         correction_form: Callable = harmonic,
     ):
@@ -984,9 +990,12 @@ class Angle(Force):
         The window size used in SciPy's savgol_filter method.
     smoothing_order : int, optional default 2
         The smoothing order used in SciPy's savgol_filter method.
-    correction_fit_window: int, optional default 10
+    correction_fit_window: int, optional default None
         The window size (number of data points) to use when fitting
         the iterative potential to head and tail correction forms.
+        When None (the default), the window is chosen automatically by
+        sweeping candidate windows and keeping the most stable fit, so
+        it does not need to be tuned by hand.
         This is only used when the Force is set to be optimized.
     maxfev : int, optional
         Sets the maximum number of attemps when using scipy.curve_fit
@@ -1007,7 +1016,7 @@ class Angle(Force):
         nbins: Optional[int] = None,
         smoothing_window: Optional[int] = 15,
         smoothing_order: Optional[int] = 2,
-        correction_fit_window: Optional[int] = 10,
+        correction_fit_window: Optional[int] = None,
         maxfev: Optional[int] = 1000,
         correction_form: Callable = harmonic,
     ):
@@ -1177,9 +1186,12 @@ class Pair(Force):
         The window size used in SciPy's savgol_filter method.
     smoothing_order : int, optional default 2
         The smoothing order used in SciPy's savgol_filter method.
-    correction_fit_window: int, optional default 8
+    correction_fit_window: int, optional default None
         The window size (number of data points) to use when fitting
         the iterative potential to head and tail correction forms.
+        When None (the default), the window is chosen automatically by
+        sweeping candidate windows and keeping the most stable fit, so
+        it does not need to be tuned by hand.
         This is only used when the Force is set to be optimized.
     maxfev : int, optional
         Sets the maximum number of attemps when using scipy.curve_fit
@@ -1203,7 +1215,7 @@ class Pair(Force):
         exclude_all_bonded: bool = False,
         smoothing_window: Optional[int] = 11,
         smoothing_order: Optional[int] = 2,
-        correction_fit_window: Optional[int] = 8,
+        correction_fit_window: Optional[int] = None,
         maxfev: Optional[int] = 1000,
         head_correction_form: Callable = exponential,
     ):
@@ -1403,9 +1415,12 @@ class Dihedral(Force):
         The window size used in SciPy's savgol_filter method.
     smoothing_order : int, optional default 2
         The smoothing order used in SciPy's savgol_filter method.
-    correction_fit_window: int, optional default 10
+    correction_fit_window: int, optional default None
         The window size (number of data points) to use when fitting
         the iterative potential to head and tail correction forms.
+        When None (the default), the window is chosen automatically by
+        sweeping candidate windows and keeping the most stable fit, so
+        it does not need to be tuned by hand.
         This is only used when the Force is set to be optimized.
     maxfev : int, optional
         Sets the maximum number of attemps when using scipy.curve_fit
@@ -1427,7 +1442,7 @@ class Dihedral(Force):
         nbins: Optional[int] = None,
         smoothing_window: Optional[int] = 11,
         smoothing_order: Optional[int] = 2,
-        correction_fit_window: Optional[int] = 10,
+        correction_fit_window: Optional[int] = None,
         maxfev: Optional[int] = 1000,
         correction_form: Callable = harmonic,
     ):

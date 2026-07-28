@@ -2,6 +2,8 @@ import numpy as np
 import pytest
 
 from msibi.utils.corrections import (
+    _anchored_predict,
+    _select_window,
     bonded_corrections,
     exponential,
     harmonic,
@@ -165,3 +167,73 @@ def test_pair_no_tail_corrections():
     )
     assert not np.allclose(V, V_corrected, atol=1e-3)
     assert head_start == 15
+
+
+@pytest.mark.parametrize("side", ["head", "tail"])
+@pytest.mark.parametrize("form", [harmonic, exponential, linear])
+def test_anchored_prediction_is_c1_continuous(side, form):
+    """The extrapolation must join the real data with matching value and slope.
+
+    This is the invariant the refactor guarantees: for any correction form,
+    window, and (noisy) data, the filled region leaves the real data with the
+    same value and first derivative at the seam, so there is no force
+    discontinuity. We check it directly on _anchored_predict rather than through
+    the noise, since the pin is exact by construction.
+    """
+    rng = np.random.default_rng(0)
+    x = np.linspace(0.5, 4.0, 200)
+    # A deliberately non-harmonic (anharmonic) well so the form is mis-specified.
+    v = 8.0 * (x - 2.0) ** 4 + 4.0 * (x - 2.0) ** 2 + rng.normal(0, 0.02, x.size)
+
+    x_b = x[0] if side == "head" else x[-1]
+    step = 1e-6
+    into_gap = x_b - step if side == "head" else x_b + step
+    x_probe = np.array([x_b, into_gap])
+    pred = _anchored_predict(x, v, x_probe, form, 5000, side, 12)
+
+    # Value continuity: the curve passes exactly through the boundary datum.
+    v_b = v[0] if side == "head" else v[-1]
+    assert np.isclose(pred[0], v_b, atol=1e-9)
+
+    # Slope continuity: the slope leaving the boundary equals the data's local
+    # slope there (the noise-averaged boundary slope estimate).
+    if side == "head":
+        u, vv = x[:12] - x_b, v[:12]
+    else:
+        u, vv = x[-12:] - x_b, v[-12:]
+    s_data = np.polyval(np.polyder(np.polyfit(u, vv, 2)), 0.0)
+    s_pred = (pred[1] - pred[0]) / (into_gap - x_b)
+    assert np.isclose(s_pred, s_data, rtol=1e-4)
+
+
+def test_auto_window_sweep_fills_gap():
+    """fit_window_size=None chooses the window automatically and fills the gap."""
+    x, V = generate_parabolic_potential(x0=2, x_range=(0, 4), noise_level=0.02)
+    V_missing = np.copy(V)
+    V_missing[0:15] = np.inf
+    V_missing[-15:] = np.inf
+    V_corrected, head_start, tail_start, real_indices = bonded_corrections(
+        x=x,
+        V=V_missing,
+        fit_window_size=None,
+        head_correction_func=harmonic,
+        tail_correction_func=harmonic,
+        maxfev=3000,
+        smoothing_order=None,
+        smoothing_window=None,
+    )
+    # The gap is filled with finite values and the head/tail rise above the well.
+    assert np.all(np.isfinite(V_corrected))
+    assert head_start == 15
+    assert tail_start == 85
+    assert np.all(V_corrected[:head_start] > np.min(V_corrected))
+    assert np.all(V_corrected[tail_start:] > np.min(V_corrected))
+
+
+def test_select_window_returns_window_in_range():
+    """The sweep returns an integer window inside the searched bounds."""
+    x, V = generate_parabolic_potential(x0=2, x_range=(0, 4), noise_level=0.02)
+    real = np.arange(15, 85)
+    w = _select_window(x[real], V[real], x[:15], harmonic, 3000, side="head")
+    assert isinstance(w, (int, np.integer))
+    assert 4 <= w <= 25
