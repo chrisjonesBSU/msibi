@@ -1,6 +1,5 @@
 import os
 import shutil
-from typing import Union
 
 import gsd.hoomd
 import hoomd
@@ -9,7 +8,7 @@ import numpy as np
 from msibi.utils.potentials import alpha_array
 
 
-class State(object):
+class State:
     """A single state point used as part of a multistate optimization.
 
     Parameters
@@ -96,7 +95,7 @@ class State(object):
         self._sampling_stride = value
 
     @property
-    def alpha0(self) -> Union[int, float]:
+    def alpha0(self) -> int | float:
         """State point base weighting value."""
         return self._alpha0
 
@@ -109,7 +108,7 @@ class State(object):
 
     def alpha(
         self, pot_x_range: np.ndarray = None, dx: float = None
-    ) -> Union[float, np.ndarray]:
+    ) -> float | np.ndarray:
         """State point weighting value, also known as alpha.
 
         .. note::

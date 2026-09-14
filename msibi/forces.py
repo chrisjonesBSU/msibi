@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Callable, Optional, Union
+from collections.abc import Callable
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -94,12 +94,12 @@ class Force:
         self,
         name: str,
         optimize: bool,
-        nbins: Optional[int] = None,
-        smoothing_window: Optional[int] = None,
-        smoothing_order: Optional[int] = None,
-        correction_fit_window: Optional[int] = None,
-        maxfev: Optional[int] = 3000,
-        correction_form: Optional[Callable] = None,
+        nbins: int | None = None,
+        smoothing_window: int | None = None,
+        smoothing_order: int | None = None,
+        correction_fit_window: int | None = None,
+        maxfev: int | None = 3000,
+        correction_form: Callable | None = None,
     ):
         if optimize and not nbins or optimize and nbins <= 0:
             raise ValueError(
@@ -370,9 +370,9 @@ class Force:
 
     def plot_potential(
         self,
-        file_path: Optional[str] = None,
-        xlim: Optional[tuple] = None,
-        ylim: Optional[tuple] = None,
+        file_path: str | None = None,
+        xlim: tuple | None = None,
+        ylim: tuple | None = None,
     ) -> None:
         """Plot the currently optimized potential energy.
 
@@ -402,9 +402,9 @@ class Force:
 
     def plot_potential_history(
         self,
-        file_path: Optional[str] = None,
-        xlim: Optional[tuple] = None,
-        ylim: Optional[tuple] = None,
+        file_path: str | None = None,
+        xlim: tuple | None = None,
+        ylim: tuple | None = None,
     ) -> None:
         """Plot the history of the optimized potential energy.
 
@@ -437,7 +437,7 @@ class Force:
     def plot_distribution_comparison(
         self,
         state: msibi.state.State,
-        file_path: Optional[str] = None,
+        file_path: str | None = None,
     ) -> None:
         """Plot the target distribution and most recent query distribution.
 
@@ -513,12 +513,12 @@ class Force:
 
     def set_polynomial(
         self,
-        k2: Union[float, int],
-        k3: Union[float, int],
-        k4: Union[float, int],
-        x0: Union[float, int],
-        x_min: Union[float, int],
-        x_max: Union[float, int],
+        k2: float,
+        k3: float,
+        k4: float,
+        x0: float,
+        x_min: float,
+        x_max: float,
     ) -> None:
         """Set a potential based on the following function:
 
@@ -822,16 +822,16 @@ class Bond(Force):
         type1: str,
         type2: str,
         optimize: bool,
-        nbins: Optional[int] = None,
-        smoothing_window: Optional[int] = 15,
-        smoothing_order: Optional[int] = 2,
-        correction_fit_window: Optional[int] = 10,
-        maxfev: Optional[int] = 1000,
+        nbins: int | None = None,
+        smoothing_window: int | None = 15,
+        smoothing_order: int | None = 2,
+        correction_fit_window: int | None = 10,
+        maxfev: int | None = 1000,
         correction_form: Callable = harmonic,
     ):
         self.type1, self.type2 = sorted([type1, type2], key=natural_sort)
         name = f"{self.type1}-{self.type2}"
-        super(Bond, self).__init__(
+        super().__init__(
             name=name,
             optimize=optimize,
             nbins=nbins,
@@ -874,7 +874,7 @@ class Bond(Force):
         if optimize_against and state in self._states:
             self._update_target_distribution(state)
 
-    def set_harmonic(self, r0: Union[float, int], k: Union[float, int]) -> None:
+    def set_harmonic(self, r0: float, k: float) -> None:
         """Set a fixed harmonic bond potential.
 
         .. warning::
@@ -1004,18 +1004,18 @@ class Angle(Force):
         type2: str,
         type3: str,
         optimize: bool,
-        nbins: Optional[int] = None,
-        smoothing_window: Optional[int] = 15,
-        smoothing_order: Optional[int] = 2,
-        correction_fit_window: Optional[int] = 10,
-        maxfev: Optional[int] = 1000,
+        nbins: int | None = None,
+        smoothing_window: int | None = 15,
+        smoothing_order: int | None = 2,
+        correction_fit_window: int | None = 10,
+        maxfev: int | None = 1000,
         correction_form: Callable = harmonic,
     ):
         self.type1 = type1
         self.type2 = type2
         self.type3 = type3
         name = f"{self.type1}-{self.type2}-{self.type3}"
-        super(Angle, self).__init__(
+        super().__init__(
             name=name,
             optimize=optimize,
             nbins=nbins,
@@ -1058,7 +1058,7 @@ class Angle(Force):
         if optimize_against and state in self._states:
             self._update_target_distribution(state)
 
-    def set_harmonic(self, t0: Union[float, int], k: Union[float, int]) -> None:
+    def set_harmonic(self, t0: float, k: float) -> None:
         """Set a fixed harmonic angle potential.
 
         .. warning::
@@ -1196,15 +1196,15 @@ class Pair(Force):
         type1: str,
         type2: str,
         optimize: bool,
-        nbins: Optional[int] = None,
-        r_cut: Optional[Union[float, int]] = None,
-        r_switch: Optional[Union[float, int]] = None,
+        nbins: int | None = None,
+        r_cut: float | None = None,
+        r_switch: float | None = None,
         exclude_bond_depth: int = 0,
         exclude_all_bonded: bool = False,
-        smoothing_window: Optional[int] = 11,
-        smoothing_order: Optional[int] = 2,
-        correction_fit_window: Optional[int] = 8,
-        maxfev: Optional[int] = 1000,
+        smoothing_window: int | None = 11,
+        smoothing_order: int | None = 2,
+        correction_fit_window: int | None = 8,
+        maxfev: int | None = 1000,
         head_correction_form: Callable = exponential,
     ):
         if exclude_all_bonded and exclude_bond_depth not in (0, None):
@@ -1225,7 +1225,7 @@ class Pair(Force):
         # Pair types in hoomd have a different tuple naming structure.
         # Using different attr above to keep consistent msibi.force.Force.name format.
         self._pair_name = (self.type1, self.type2)
-        super(Pair, self).__init__(
+        super().__init__(
             name=name,
             optimize=optimize,
             nbins=nbins,
@@ -1286,10 +1286,10 @@ class Pair(Force):
 
     def set_lj(
         self,
-        r_min: Union[float, int],
-        r_cut: Union[float, int],
-        epsilon: Union[float, int],
-        sigma: Union[float, int],
+        r_min: float,
+        r_cut: float,
+        epsilon: float,
+        sigma: float,
     ) -> None:
         """Set a 12-6 Lennard Jones table pair potential used in query simulations.
 
@@ -1424,11 +1424,11 @@ class Dihedral(Force):
         type3: str,
         type4: str,
         optimize: bool,
-        nbins: Optional[int] = None,
-        smoothing_window: Optional[int] = 11,
-        smoothing_order: Optional[int] = 2,
-        correction_fit_window: Optional[int] = 10,
-        maxfev: Optional[int] = 1000,
+        nbins: int | None = None,
+        smoothing_window: int | None = 11,
+        smoothing_order: int | None = 2,
+        correction_fit_window: int | None = 10,
+        maxfev: int | None = 1000,
         correction_form: Callable = harmonic,
     ):
         self.type1 = type1
@@ -1436,7 +1436,7 @@ class Dihedral(Force):
         self.type3 = type3
         self.type4 = type4
         name = f"{self.type1}-{self.type2}-{self.type3}-{self.type4}"
-        super(Dihedral, self).__init__(
+        super().__init__(
             name=name,
             optimize=optimize,
             nbins=nbins,
@@ -1481,8 +1481,8 @@ class Dihedral(Force):
 
     def set_periodic(
         self,
-        phi0: Union[float, int],
-        k: Union[float, int],
+        phi0: float,
+        k: float,
         d: int,
         n: int,
     ) -> None:
