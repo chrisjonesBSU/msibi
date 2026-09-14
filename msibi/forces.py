@@ -121,8 +121,8 @@ class Force:
         self.x_range = None
         self.potential_history = []
         self._potential = None
-        self._states = dict()
-        self._pending_state_params = dict()
+        self._states = {}
+        self._pending_state_params = {}
         self._head_correction_history = []
         self._tail_correction_history = []
         self._learned_potential_history = []
@@ -307,7 +307,7 @@ class Force:
         return self._states[state]["target_distribution"]
 
     def plot_target_distribution(
-        self, state: msibi.state.State, file_path: str = None
+        self, state: msibi.state.State, file_path: str | None = None
     ) -> None:
         """Plot the target distribution corresponding to this force and state point.
 
@@ -349,7 +349,7 @@ class Force:
         if file_path:
             plt.savefig(file_path)
 
-    def plot_fit_scores(self, state: msibi.state.State, file_path: str = None) -> None:
+    def plot_fit_scores(self, state: msibi.state.State, file_path: str | None = None) -> None:
         """Plot the evolution of the distribution matching fit scores.
 
         Parameters
@@ -904,7 +904,7 @@ class Bond(Force):
             )
         self.format = "static"
         self.force_init = "Harmonic"
-        self.force_entry = dict(r0=r0, k=k)
+        self.force_entry = {"r0": r0, "k": k}
 
     def _table_entry(self) -> dict:
         """Set the correct entry to use in ``hoomd.md.bond.Table``"""
@@ -1088,7 +1088,7 @@ class Angle(Force):
             )
         self.format = "static"
         self.force_init = "Harmonic"
-        self.force_entry = dict(t0=t0, k=k)
+        self.force_entry = {"t0": t0, "k": k}
 
     def _table_entry(self) -> dict:
         """Set the correct entry to use in ``hoomd.md.angle.Table``"""
@@ -1518,7 +1518,7 @@ class Dihedral(Force):
             )
         self.format = "static"
         self.force_init = "Periodic"
-        self.force_entry = dict(phi0=phi0, k=k, d=d, n=n)
+        self.force_entry = {"phi0": phi0, "k": k, "d": d, "n": n}
 
     def _table_entry(self) -> dict:
         """Set the correct entry to use in ``hoomd.md.dihedral.Table``"""

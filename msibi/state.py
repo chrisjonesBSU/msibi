@@ -107,7 +107,7 @@ class State:
         self._alpha0 = value
 
     def alpha(
-        self, pot_x_range: np.ndarray = None, dx: float = None
+        self, pot_x_range: np.ndarray = None, dx: float | None = None
     ) -> float | np.ndarray:
         """State point weighting value, also known as alpha.
 
@@ -196,7 +196,7 @@ class State:
         print(f"Finished simulation {iteration} for state {self}. TPS = {sim.tps}")
         print()
 
-    def _setup_dir(self, name: str, kT: float, dir_name: str = None) -> str:
+    def _setup_dir(self, name: str, kT: float, dir_name: str | None = None) -> str:
         """Create a state directory each time a new State is created."""
         if dir_name is None:
             if not os.path.isdir("states"):

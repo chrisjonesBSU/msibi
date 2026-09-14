@@ -113,7 +113,7 @@ def bonded_corrections(
     x_head_pivot = x_real[fit_window_size - 1]
     x_head_fit = _shift_x(x_real[:fit_window_size], origin=x_head_pivot)
     try:
-        popt_head, pcov_head = curve_fit(
+        popt_head, _pcov_head = curve_fit(
             f=head_correction_func,
             xdata=x_head_fit,
             ydata=v_real[:fit_window_size],
@@ -130,7 +130,7 @@ def bonded_corrections(
 
     # tail correction (i.e., right side of potential)
     try:
-        popt_tail, pcov_tail = curve_fit(
+        popt_tail, _pcov_tail = curve_fit(
             f=tail_correction_func,
             xdata=x_real[-fit_window_size:],
             ydata=v_real[-fit_window_size:],
@@ -202,7 +202,7 @@ def pair_corrections(
     # head correction (short range repulsion)
     # Get fit parameters for where we actually have data
     try:
-        popt_head, pcov_head = curve_fit(
+        popt_head, _pcov_head = curve_fit(
             f=head_correction_func,
             xdata=x_real[: fit_window_size + 1],
             ydata=v_real[: fit_window_size + 1],
