@@ -1,4 +1,4 @@
-from typing import Callable, Union
+from collections.abc import Callable
 
 import more_itertools as mit
 import numpy as np
@@ -18,7 +18,7 @@ See smoothing_window, correction_fit_window, smoothing_order, maxfev in msibi.Fo
 """
 
 
-def harmonic(x: np.ndarray, x0: Union[float, int], k: Union[float, int]):
+def harmonic(x: np.ndarray, x0: float, k: float):
     """Used as the default correction form for bonded forces.
 
         :math:`V(x) = 0.5*k(x - x0)^2`
@@ -32,7 +32,7 @@ def harmonic(x: np.ndarray, x0: Union[float, int], k: Union[float, int]):
     return 0.5 * k * (x - x0) ** 2
 
 
-def exponential(x: np.ndarray, A: Union[float, int], B: Union[float, int]):
+def exponential(x: np.ndarray, A: float, B: float):
     """Used as the default head correction for non-bonded pair potentials.
 
     :math:`V(x) = A*exp(-Bx)`
@@ -41,7 +41,7 @@ def exponential(x: np.ndarray, A: Union[float, int], B: Union[float, int]):
     return A * np.exp(-B * x)
 
 
-def linear(x: np.ndarray, m: Union[float, int], b: Union[float, int]):
+def linear(x: np.ndarray, m: float, b: float):
     """Functional form that can be used for head or tail corrections.
 
     :math:`V(x) = mx + b`
@@ -113,7 +113,7 @@ def bonded_corrections(
     x_head_pivot = x_real[fit_window_size - 1]
     x_head_fit = _shift_x(x_real[:fit_window_size], origin=x_head_pivot)
     try:
-        popt_head, pcov_head = curve_fit(
+        popt_head, _pcov_head = curve_fit(
             f=head_correction_func,
             xdata=x_head_fit,
             ydata=v_real[:fit_window_size],
@@ -130,7 +130,7 @@ def bonded_corrections(
 
     # tail correction (i.e., right side of potential)
     try:
-        popt_tail, pcov_tail = curve_fit(
+        popt_tail, _pcov_tail = curve_fit(
             f=tail_correction_func,
             xdata=x_real[-fit_window_size:],
             ydata=v_real[-fit_window_size:],
@@ -153,7 +153,7 @@ def bonded_corrections(
 def pair_corrections(
     x: np.ndarray,
     V: np.ndarray,
-    r_switch: Union[float, int],
+    r_switch: float,
     smoothing_window: int,
     smoothing_order: int,
     fit_window_size: int,
@@ -202,7 +202,7 @@ def pair_corrections(
     # head correction (short range repulsion)
     # Get fit parameters for where we actually have data
     try:
-        popt_head, pcov_head = curve_fit(
+        popt_head, _pcov_head = curve_fit(
             f=head_correction_func,
             xdata=x_real[: fit_window_size + 1],
             ydata=v_real[: fit_window_size + 1],
@@ -269,7 +269,7 @@ def _get_real_indices(V: np.ndarray):
     return real_idx
 
 
-def _shift_x(x: np.ndarray, origin: Union[float, int]):
+def _shift_x(x: np.ndarray, origin: float):
     """Shift x-values in order to generate increasing f(x) as x decreases.
 
     This is used for bonded_corrections().

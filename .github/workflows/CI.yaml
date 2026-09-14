@@ -12,7 +12,6 @@ on:
 
 jobs:
   test:
-    if: github.event.pull_request.draft == false
     name: MSIBI Tests (python)
     runs-on: ${{ matrix.os }}
     strategy:
@@ -26,11 +25,11 @@ jobs:
         shell: bash -l {0}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         name: Checkout Branch / Pull Request
 
       - name: Install Mamba
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: environment-dev.yml
           create-args: >-
@@ -43,14 +42,13 @@ jobs:
         run: python -m pytest -v --cov=msibi --cov-report=xml --cov-append --cov-config=setup.cfg --color yes --pyargs msibi
 
       - name: Upload Coverage Report
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: MSIBI-Coverage
           verbose: true
 
   arch-test:
-    if: github.event.pull_request.draft == false
     name: MSIBI Tests (arch)
     runs-on: ${{ matrix.os }}
     strategy:
@@ -64,11 +62,11 @@ jobs:
         shell: bash -l {0}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         name: Checkout Branch / Pull Request
 
       - name: Install Mamba
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: environment-dev.yml
           create-args: >-
@@ -81,7 +79,6 @@ jobs:
         run: python -m pytest -v --color yes --pyargs msibi
 
   wsl-test:
-    if: github.event.pull_request.draft == false
     name: MSIBI Tests (WSL)
     runs-on: windows-latest
 
@@ -89,7 +86,7 @@ jobs:
       - uses: actions/checkout@v4
         name: Checkout Branch / Pull Request
 
-      - uses: Vampire/setup-wsl@v5
+      - uses: Vampire/setup-wsl@v7
         with:
           distribution: Ubuntu-24.04
           wsl-shell-user: runner

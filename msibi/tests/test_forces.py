@@ -291,8 +291,10 @@ class TestForce(BaseTest):
         bond = Bond(type1="A", type2="B", optimize=False)
         bond.set_harmonic(k=500, r0=2)
         with pytest.warns(UserWarning):
-            bond.potential
-            bond.force
+            _ = bond.potential
+
+        with pytest.warns(UserWarning):
+            _ = bond.force
 
     def test_bad_smoothing_args(self, bond):
         bond.optimize = True
