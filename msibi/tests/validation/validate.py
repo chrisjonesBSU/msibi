@@ -4,8 +4,9 @@ import warnings
 
 import hoomd
 import numpy as np
-from msibi import MSIBI, Angle, Bond, Pair, State
 from scipy.optimize import curve_fit
+
+from msibi import MSIBI, Angle, Bond, Pair, State
 
 warnings.filterwarnings("ignore")
 _dir = os.path.dirname(os.path.abspath(__file__))

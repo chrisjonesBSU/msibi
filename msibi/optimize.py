@@ -230,8 +230,8 @@ class MSIBI:
         forces = self._build_force_objects()
         if len(forces) == 0:
             raise RuntimeError("No forces have been created yet. See MSIBI.add_force()")
-        f = open(file_path, "wb")
-        pickle.dump(forces, f)
+        with open(file_path, "wb") as f:
+            pickle.dump(forces, f)
 
     def _build_force_objects(self) -> list:
         """Creates force objects for query simulations."""

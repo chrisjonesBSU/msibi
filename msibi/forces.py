@@ -349,7 +349,9 @@ class Force:
         if file_path:
             plt.savefig(file_path)
 
-    def plot_fit_scores(self, state: msibi.state.State, file_path: str | None = None) -> None:
+    def plot_fit_scores(
+        self, state: msibi.state.State, file_path: str | None = None
+    ) -> None:
         """Plot the evolution of the distribution matching fit scores.
 
         Parameters
@@ -548,12 +550,13 @@ class Force:
         self.x_min = x_min
         self.x_max = x_max
         self.dx = x_max / self.nbins
-        if isinstance(self, msibi.forces.Angle):
-            if x_min != 0 or np.round(x_max, 4) != np.round(np.pi, 4):
-                raise ValueError(
-                    "Angle table potentials must be defined over the range of theta = [0, pi]. "
-                    "Set x_min=0 and x_max=np.pi"
-                )
+        if isinstance(self, msibi.forces.Angle) and (
+            x_min != 0 or np.round(x_max, 4) != np.round(np.pi, 4)
+        ):
+            raise ValueError(
+                "Angle table potentials must be defined over the range of theta = [0, pi]. "
+                "Set x_min=0 and x_max=np.pi"
+            )
         if isinstance(self, msibi.forces.Dihedral):
             self.dx *= 2
             self.x_range = np.arange(x_min, x_max + self.dx / 2, self.dx)
