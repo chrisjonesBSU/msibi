@@ -625,6 +625,8 @@ class Force:
 
         if self.optimize and self._states[state]["optimize_against"]:
             target_distribution = self._get_state_distribution(state=state, query=False)
+            # Find range of initial zero values
+            # Save these indices
             if self.smoothing_window and self.smoothing_order:
                 target_distribution[:, 1] = savgol_filter(
                     x=target_distribution[:, 1],
@@ -633,6 +635,7 @@ class Force:
                 )
                 neg_indices = np.where(target_distribution[:, 1] < 0)[0]
                 target_distribution[:, 1][neg_indices] = 0
+                # Turn the initial zero-window indices back to zero
         else:
             target_distribution = None
         self._states[state]["target_distribution"] = target_distribution

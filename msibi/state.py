@@ -187,6 +187,7 @@ class State(object):
             mode="wb",
         )
         sim.operations.writers.append(gsd_writer)
+        sim.state.thermalize_particle_momenta(filter=hoomd.filter.All(), kT=self.kT)
         # Run simulation
         sim.run(n_steps)
         gsd_writer.flush()
