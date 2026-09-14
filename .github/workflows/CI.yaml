@@ -12,7 +12,6 @@ on:
 
 jobs:
   test:
-    if: github.event.pull_request.draft == false
     name: MSIBI Tests (python)
     runs-on: ${{ matrix.os }}
     strategy:
@@ -50,7 +49,6 @@ jobs:
           verbose: true
 
   arch-test:
-    if: github.event.pull_request.draft == false
     name: MSIBI Tests (arch)
     runs-on: ${{ matrix.os }}
     strategy:
@@ -81,7 +79,6 @@ jobs:
         run: python -m pytest -v --color yes --pyargs msibi
 
   wsl-test:
-    if: github.event.pull_request.draft == false
     name: MSIBI Tests (WSL)
     runs-on: windows-latest
 
